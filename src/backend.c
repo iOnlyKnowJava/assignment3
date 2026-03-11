@@ -203,31 +203,40 @@ void update_received_buf(ut_socket_t* sock, uint8_t* pkt) {
       * Merge any overlapping segments by calling `merge_recv_segs` when necessary.
     */
     ut_tcp_header_t* hdr = (ut_tcp_header_t*)pkt;
-    if (get_payload_len(pkt) == 0) {
+    uint32_t potential_end = before(sock->recv_win.last_read + MAX_NETWORK_BUFFER, get_seq(hdr) + get_payload_len(pkt) - 1) ? sock->recv_win.last_read + MAX_NETWORK_BUFFER : get_seq(hdr) + get_payload_len(pkt) - 1;
+    if (get_payload_len(pkt) == 0 || potential_end + 1 < sock->recv_win.next_expect || get_seq(hdr) > sock->recv_win.last_read + MAX_NETWORK_BUFFER) {
+        if (get_payload_len(pkt)) {
+            send_empty(sock, ACK_FLAG_MASK, false, false);
+        }
         return;
     }
 
-    uint32_t potential_end = before(sock->recv_win.last_read + MAX_NETWORK_BUFFER, get_seq(hdr) + get_payload_len(pkt) - 1) ? sock->recv_win.last_read + MAX_NETWORK_BUFFER : get_seq(hdr) + get_payload_len(pkt) - 1;
     uint32_t new_end = after(potential_end, sock->recv_win.last_recv) ? potential_end : sock->recv_win.last_recv;
-    if (sock->recv_win.last_recv != new_end) {
-        sock->recv_win.last_recv = new_end;
-        if (sock->recv_win.last_recv - sock->recv_win.last_read) {
-            sock->received_buf = realloc(sock->received_buf, sock->recv_win.last_recv - sock->recv_win.last_read);
-        } else {
-            if (sock->received_buf) {
-                free(sock->received_buf);
-                sock->received_buf = NULL;
-            }
+    sock->recv_win.last_recv = new_end;
+    if (sock->recv_win.last_recv != sock->recv_win.last_read) {
+        sock->received_buf = realloc(sock->received_buf, sock->recv_win.last_recv - sock->recv_win.last_read);
+        // printf("%d\n", sock->recv_win.last_recv - sock->recv_win.last_read);
+    } else {
+        // printf("%d %d\n", sock->recv_win.last_recv, sock->recv_win.last_read);
+        if (sock->received_buf) {
+            free(sock->received_buf);
+            sock->received_buf = NULL;
         }
     }
     if (sock->received_buf) {
-        memcpy(sock->received_buf + get_seq(hdr) - sock->recv_win.last_read - 1, get_payload(pkt), MIN(get_payload_len(pkt), sock->recv_win.last_recv - get_seq(hdr) + 1));
+        uint32_t seq = get_seq(hdr);
+        uint32_t num = get_payload_len(hdr);
+        if (seq < sock->recv_win.last_read + 1) {
+            num -= sock->recv_win.last_read + 1 - seq;
+            seq = sock->recv_win.last_read + 1;
+        }
+        memcpy(sock->received_buf + seq - sock->recv_win.last_read - 1u, get_payload(pkt), MIN(num, sock->recv_win.last_recv - seq + 1u));
     }
 
     if (get_seq(hdr) == sock->recv_win.next_expect) {
         sock->recv_win.next_expect = potential_end + 1;
     } else {
-        add_recv_seg(sock, get_seq(hdr), potential_end);
+        add_recv_seg(sock, after(get_seq(hdr),sock->recv_win.last_read+1)?get_seq(hdr):sock->recv_win.last_read+1, potential_end);
     }
     merge_recv_segs(sock);
     send_empty(sock, ACK_FLAG_MASK, false, false);
@@ -256,12 +265,13 @@ void handle_pkt(ut_socket_t* sock, uint8_t* pkt) {
     * If the ACK is for a new sequence, update the send window and congestion control (call `handle_ack`).
     * Update the receive buffer (call `update_received_buf`).
     */
+    sock->send_adv_win = get_advertised_window(hdr);
     if (flags & FIN_FLAG_MASK) {
         sock->recv_fin = true;
         sock->recv_fin_seq = get_seq(hdr);
         send_empty(sock, ACK_FLAG_MASK, true, false);
+        return;
     }
-    sock->send_adv_win = get_advertised_window(hdr);
     if (flags & ACK_FLAG_MASK) {
         if (check_dying(sock) && get_ack(hdr) == sock->send_fin_seq + 1) {
             sock->fin_acked = true;
@@ -360,7 +370,7 @@ void send_pkts_data(ut_socket_t* sock) {
       * Update the last sent sequence number after each packet is sent.
     */
     uint32_t total_send = MIN(sock->cong_win, sock->send_win.last_write - sock->send_win.last_sent);
-    if (total_send && sock->send_adv_win == 0) {
+    if (total_send > 0 && sock->send_adv_win == 0) {
         total_send = 1;
     } else {
         total_send = MIN(total_send, sock->send_adv_win);
@@ -368,7 +378,7 @@ void send_pkts_data(ut_socket_t* sock) {
     // printf("%d %d\n", sock->cong_win, sock->slow_start_thresh);
     // printf("%d\n", sock->send_adv_win);
     // printf("%u %u %u %u %u %u %u\n", total_send, sock->cong_win, sock->send_win.last_write - sock->send_win.last_sent, sock->send_adv_win, sock->recv_fin, sock->fin_acked,sock->dying);
-    // printf("%d %d %d %d %d %d %d\n", total_send, sock->send_win.last_ack, sock->send_win.last_sent, sock->send_win.last_write, sock->recv_win.last_read, sock->recv_win.next_expect, sock->recv_win.last_recv);
+    printf("%d %d %d %d %d %d %d\n", total_send, sock->send_win.last_ack, sock->send_win.last_sent, sock->send_win.last_write, sock->recv_win.last_read, sock->recv_win.next_expect, sock->recv_win.last_recv);
     // fflush(stdout);
     while (total_send) {
         size_t conn_len = sizeof(sock->conn);
@@ -382,7 +392,10 @@ void send_pkts_data(ut_socket_t* sock) {
         uint16_t hlen = sizeof(ut_tcp_header_t);
         uint16_t adv_window = MAX_NETWORK_BUFFER + sock->recv_win.last_read - sock->recv_win.last_recv;
         uint16_t payload_len = MIN(MSS, total_send);
-
+        if(!sock->sending_buf){
+          printf("%d %d %d\n",sock->send_win.last_ack,sock->send_win.last_sent,sock->send_win.last_write);
+          exit(2);
+        }
         uint8_t* payload = sock->sending_buf + sock->send_win.last_sent - sock->send_win.last_ack;
         uint16_t plen = hlen + payload_len;
 

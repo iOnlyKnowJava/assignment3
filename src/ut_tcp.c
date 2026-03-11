@@ -166,6 +166,7 @@ int ut_read(ut_socket_t *sock, void *buf, int length, ut_read_mode_t flags) {
       uint32_t avail = sock->recv_win.next_expect - sock->recv_win.last_read - 1;
       if (avail > 0) {
         read_len = avail > length ? length : avail;
+        printf("%d %d %d\n",sock->recv_win.next_expect,sock->recv_win.last_read,sock->recv_win.last_recv);
         memcpy(buf, sock->received_buf, read_len);
         if (read_len < sock->received_len) {
           new_buf = malloc(sock->received_len - read_len);
