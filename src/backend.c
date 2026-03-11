@@ -119,6 +119,7 @@ void handle_ack(ut_socket_t* sock, ut_tcp_header_t* hdr) {
         if (after(get_ack(hdr) - 1, sock->send_win.last_ack)) {
             uint32_t prev_ack = sock->send_win.last_ack;
             sock->send_win.last_ack = get_ack(hdr) - 1;
+            sock->send_win.last_sent = after(sock->send_win.last_sent,sock->send_win.last_ack)?sock->send_win.last_sent:sock->send_win.last_ack;
             sock->sending_len = sock->send_win.last_write - sock->send_win.last_ack;
             if (sock->sending_len) {
                 uint8_t* temp = malloc(sock->sending_len);
@@ -129,6 +130,7 @@ void handle_ack(ut_socket_t* sock, ut_tcp_header_t* hdr) {
                 if (sock->sending_buf) {
                     free(sock->sending_buf);
                     sock->sending_buf = NULL;
+                    // printf("\n%d %d\n",sock->send_win.last_write,sock->send_win.last_ack);
                 }
             }
         }
@@ -375,10 +377,10 @@ void send_pkts_data(ut_socket_t* sock) {
     } else {
         total_send = MIN(total_send, sock->send_adv_win);
     }
-    // printf("%d %d\n", sock->cong_win, sock->slow_start_thresh);
+    printf("%d %d\n", sock->cong_win, sock->slow_start_thresh);
     // printf("%d\n", sock->send_adv_win);
     // printf("%u %u %u %u %u %u %u\n", total_send, sock->cong_win, sock->send_win.last_write - sock->send_win.last_sent, sock->send_adv_win, sock->recv_fin, sock->fin_acked,sock->dying);
-    printf("%d %d %d %d %d %d %d\n", total_send, sock->send_win.last_ack, sock->send_win.last_sent, sock->send_win.last_write, sock->recv_win.last_read, sock->recv_win.next_expect, sock->recv_win.last_recv);
+    // printf("%d %d %d %d %d %d %d\n", total_send, sock->send_win.last_ack, sock->send_win.last_sent, sock->send_win.last_write, sock->recv_win.last_read, sock->recv_win.next_expect, sock->recv_win.last_recv);
     // fflush(stdout);
     while (total_send) {
         size_t conn_len = sizeof(sock->conn);
@@ -392,10 +394,7 @@ void send_pkts_data(ut_socket_t* sock) {
         uint16_t hlen = sizeof(ut_tcp_header_t);
         uint16_t adv_window = MAX_NETWORK_BUFFER + sock->recv_win.last_read - sock->recv_win.last_recv;
         uint16_t payload_len = MIN(MSS, total_send);
-        if(!sock->sending_buf){
-          printf("%d %d %d\n",sock->send_win.last_ack,sock->send_win.last_sent,sock->send_win.last_write);
-          exit(2);
-        }
+
         uint8_t* payload = sock->sending_buf + sock->send_win.last_sent - sock->send_win.last_ack;
         uint16_t plen = hlen + payload_len;
 
