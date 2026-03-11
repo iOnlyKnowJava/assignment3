@@ -128,8 +128,8 @@ void handle_ack(ut_socket_t* sock, ut_tcp_header_t* hdr) {
             } else {
                 if (sock->sending_buf) {
                     free(sock->sending_buf);
+                    sock->sending_buf = NULL;
                 }
-                sock->sending_buf = NULL;
             }
         }
         pthread_mutex_unlock(&(sock->send_lock));
@@ -207,13 +207,12 @@ void update_received_buf(ut_socket_t* sock, uint8_t* pkt) {
         return;
     }
 
-    bool inorder = get_seq(hdr) == sock->recv_win.next_expect;
-    uint32_t largest_recv = after(get_seq(hdr) + get_payload_len(pkt) - 1, sock->recv_win.last_recv) ? get_seq(hdr) + get_payload_len(pkt) - 1 : sock->recv_win.last_recv;
-    uint32_t new_end = before(sock->recv_win.last_read + MAX_NETWORK_BUFFER, largest_recv) ? sock->recv_win.last_read + MAX_NETWORK_BUFFER : largest_recv;
+    uint32_t potential_end = before(sock->recv_win.last_read + MAX_NETWORK_BUFFER, get_seq(hdr) + get_payload_len(pkt) - 1) ? sock->recv_win.last_read + MAX_NETWORK_BUFFER : get_seq(hdr) + get_payload_len(pkt) - 1;
+    uint32_t new_end = after(potential_end, sock->recv_win.last_recv) ? potential_end : sock->recv_win.last_recv;
     if (sock->recv_win.last_recv != new_end) {
         sock->recv_win.last_recv = new_end;
-        if (new_end - sock->recv_win.last_read) {
-            sock->received_buf = realloc(sock->received_buf, new_end - sock->recv_win.last_read);
+        if (sock->recv_win.last_recv - sock->recv_win.last_read) {
+            sock->received_buf = realloc(sock->received_buf, sock->recv_win.last_recv - sock->recv_win.last_read);
         } else {
             if (sock->received_buf) {
                 free(sock->received_buf);
@@ -222,13 +221,13 @@ void update_received_buf(ut_socket_t* sock, uint8_t* pkt) {
         }
     }
     if (sock->received_buf) {
-        memcpy(sock->received_buf + get_seq(hdr) - sock->recv_win.last_read - 1, get_payload(pkt), MIN(get_payload_len(pkt), new_end - get_seq(hdr) + 1));
+        memcpy(sock->received_buf + get_seq(hdr) - sock->recv_win.last_read - 1, get_payload(pkt), MIN(get_payload_len(pkt), sock->recv_win.last_recv - get_seq(hdr) + 1));
     }
-    if (!inorder) {
-        add_recv_seg(sock, get_seq(hdr), new_end);
+
+    if (get_seq(hdr) == sock->recv_win.next_expect) {
+        sock->recv_win.next_expect = potential_end + 1;
     } else {
-        sock->recv_win.next_expect = after(get_seq(hdr) + get_payload_len(pkt), sock->recv_win.next_expect) ? get_seq(hdr) + get_payload_len(pkt) : sock->recv_win.next_expect;
-        sock->recv_win.next_expect = before(sock->recv_win.next_expect, sock->recv_win.last_recv + 1) ? sock->recv_win.next_expect : sock->recv_win.last_recv + 1;
+        add_recv_seg(sock, get_seq(hdr), potential_end);
     }
     merge_recv_segs(sock);
     send_empty(sock, ACK_FLAG_MASK, false, false);
@@ -366,8 +365,8 @@ void send_pkts_data(ut_socket_t* sock) {
     } else {
         total_send = MIN(total_send, sock->send_adv_win);
     }
-    printf("%d %d\n", sock->cong_win, sock->slow_start_thresh);
-    printf("%d\n", sock->send_adv_win);
+    // printf("%d %d\n", sock->cong_win, sock->slow_start_thresh);
+    // printf("%d\n", sock->send_adv_win);
     // printf("%u %u %u %u %u %u %u\n", total_send, sock->cong_win, sock->send_win.last_write - sock->send_win.last_sent, sock->send_adv_win, sock->recv_fin, sock->fin_acked,sock->dying);
     // printf("%d %d %d %d %d %d %d\n", total_send, sock->send_win.last_ack, sock->send_win.last_sent, sock->send_win.last_write, sock->recv_win.last_read, sock->recv_win.next_expect, sock->recv_win.last_recv);
     // fflush(stdout);
