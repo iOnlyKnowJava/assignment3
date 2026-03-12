@@ -5,7 +5,7 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Congestion control test - this test checks if the implementation returns to slow start on timeout.\nCongestion window did not increase by approximately MSS after exiting slow start. Make sure to increase the congestion window by approximately MSS every round trip time after exiting slow start.\nCongestion window did not increase by approximately MSS after exiting slow start. Make sure to increase the congestion window by approximately MSS every round trip time after exiting slow start.\nCongestion window did not increase by approximately MSS after exiting slow start. Make sure to increase the congestion window by approximately MSS every round trip time after exiting slow start.\nCongestion window did not increase by approximately MSS after exiting slow start. Make sure to increase the congestion window by approximately MSS every round trip time after exiting slow start.\nCongestion window did not increase by approximately MSS after exiting slow start. Make sure to increase the congestion window by approximately MSS every round trip time after exiting slow start.\nDuration of test_congestion_control.TestCases.test_cwnd_grows_after_slow_start: 3.070s\n",
+            "output": "Congestion control test - this test checks if the implementation returns to slow start on timeout.\nCongestion window did not increase by approximately MSS after exiting slow start. Make sure to increase the congestion window by approximately MSS every round trip time after exiting slow start.\nCongestion window did not increase by approximately MSS after exiting slow start. Make sure to increase the congestion window by approximately MSS every round trip time after exiting slow start.\nCongestion window did not increase by approximately MSS after exiting slow start. Make sure to increase the congestion window by approximately MSS every round trip time after exiting slow start.\nCongestion window did not increase by approximately MSS after exiting slow start. Make sure to increase the congestion window by approximately MSS every round trip time after exiting slow start.\nCongestion window did not increase by approximately MSS after exiting slow start. Make sure to increase the congestion window by approximately MSS every round trip time after exiting slow start.\nDuration of test_congestion_control.TestCases.test_cwnd_grows_after_slow_start: 3.068s\n",
             "number": "5.2"
         },
         {
@@ -13,7 +13,7 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Congestion control test - this test checks if the implementation enters fast recovery on 3 duplicate ACKs.\nInitial slow start phase...\nLast window size before duplicate ACKs: 44064 bytes\nExpected cwnd after fast recovery: 26163.0 bytes\nSending 3 duplicate ACKs to trigger fast recovery...\nMeasuring window after fast recovery...\nWindow size after fast recovery: 26163 bytes\nFast recovery successful! Window adjusted from 44064 to 26163 bytes (expected ~26163.0 bytes)\nDuration of test_congestion_control.TestCases.test_fast_recovery: 2.859s\n",
+            "output": "Congestion control test - this test checks if the implementation enters fast recovery on 3 duplicate ACKs.\nInitial slow start phase...\nLast window size before duplicate ACKs: 44064 bytes\nExpected cwnd after fast recovery: 26163.0 bytes\nSending 3 duplicate ACKs to trigger fast recovery...\nMeasuring window after fast recovery...\nWindow size after fast recovery: 26163 bytes\nFast recovery successful! Window adjusted from 44064 to 26163 bytes (expected ~26163.0 bytes)\nDuration of test_congestion_control.TestCases.test_fast_recovery: 2.855s\n",
             "number": "5.4"
         },
         {
@@ -21,7 +21,7 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Congestion control test - this test checks if the implementation returns to slow start on timeout.\nForcing timeout...\nAfter timeout:\nCongestion window decreased significantly after timeout.\nDuration of test_congestion_control.TestCases.test_goes_to_slow_start_on_timeout: 5.047s\n",
+            "output": "Congestion control test - this test checks if the implementation returns to slow start on timeout.\nForcing timeout...\nAfter timeout:\nCongestion window decreased significantly after timeout.\nDuration of test_congestion_control.TestCases.test_goes_to_slow_start_on_timeout: 5.045s\n",
             "number": "5.3"
         },
         {
@@ -29,15 +29,15 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Congestion control test - this test checks if the congestion window increases exponentially during slow start.\n  0: 2754 bytes - 2.00x\n  1: 5508 bytes - 2.00x\n  2: 11016 bytes - 2.00x\n  3: 22032 bytes - 2.00x\n  4: 44064 bytes - 2.00x\nDuration of test_congestion_control.TestCases.test_slow_start: 2.040s\n",
+            "output": "Congestion control test - this test checks if the congestion window increases exponentially during slow start.\n  0: 2754 bytes - 2.00x\n  1: 5508 bytes - 2.00x\n  2: 11016 bytes - 2.00x\n  3: 22032 bytes - 2.00x\n  4: 44064 bytes - 2.00x\nDuration of test_congestion_control.TestCases.test_slow_start: 2.038s\n",
             "number": "5.1"
         },
         {
             "name": "test_recv_window_change (test_flow_control.TestCases)",
-            "score": 2.5,
+            "score": 10.0,
             "max_score": 10.0,
-            "status": "failed",
-            "output": "Flow control test - this test checks if sender correctly responds to changes in the receiver's advertised window.\n-----------------------------------------\nTesting advertised window with size 1377 bytes\n-----------------------------------------\nTesting advertised window with size 13770 bytes\nDid not receive data packet from the sender.\nDuration of test_flow_control.TestCases.test_recv_window_change: 4.970s\n",
+            "status": "passed",
+            "output": "Flow control test - this test checks if sender correctly responds to changes in the receiver's advertised window.\n-----------------------------------------\nTesting advertised window with size 1377 bytes\n-----------------------------------------\nTesting advertised window with size 13770 bytes\n-----------------------------------------\nTesting advertised window with size 27540 bytes\n-----------------------------------------\nTesting advertised window with size 41310 bytes\nDuration of test_flow_control.TestCases.test_recv_window_change: 9.559s\n",
             "number": "3.1"
         },
         {
@@ -45,7 +45,7 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Flow control test - this test checks if the advertised window is reduced correctly when data is not consumed by the application.\nDuration of test_flow_control.TestCases.test_recv_window_size: 2.028s\n",
+            "output": "Flow control test - this test checks if the advertised window is reduced correctly when data is not consumed by the application.\nDuration of test_flow_control.TestCases.test_recv_window_size: 2.039s\n",
             "number": "3.2"
         },
         {
@@ -53,7 +53,7 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Flow control test - this test checks if the sender stops sending data when the advertised window is zero.\nAdvertising window = 0 (last_ack=2093)\nSender correctly limited transmissions with zero window (20 probe(s) received).\nDuration of test_flow_control.TestCases.test_zero_window_stops_sender: 9.208s\n",
+            "output": "Flow control test - this test checks if the sender stops sending data when the advertised window is zero.\nAdvertising window = 0 (last_ack=28687)\nSender correctly limited transmissions with zero window (20 probe(s) received).\nDuration of test_flow_control.TestCases.test_zero_window_stops_sender: 7.916s\n",
             "number": "3.3"
         },
         {
@@ -61,7 +61,7 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Initiator test - this test starts a TCP initiator and sends data to the initiator.\n-----------------------------------------\nTesting data packet with length 1\nPassed data packet with length 1\n-----------------------------------------\nTesting data packet with length 1000\nPassed data packet with length 1000\n-----------------------------------------\nTesting data packet with random length\nPassed data packet with random length\n-----------------------------------------\nTesting data packet with length 1377\nPassed data packet with length 1377\nDuration of test_initiator_handshake.TestCases.test_initiator_accepts_data: 4.822s\n",
+            "output": "Initiator test - this test starts a TCP initiator and sends data to the initiator.\n-----------------------------------------\nTesting data packet with length 1\nPassed data packet with length 1\n-----------------------------------------\nTesting data packet with length 1000\nPassed data packet with length 1000\n-----------------------------------------\nTesting data packet with random length\nPassed data packet with random length\n-----------------------------------------\nTesting data packet with length 1377\nPassed data packet with length 1377\nDuration of test_initiator_handshake.TestCases.test_initiator_accepts_data: 4.821s\n",
             "number": "1.3"
         },
         {
@@ -69,7 +69,7 @@
             "score": 5.0,
             "max_score": 5.0,
             "status": "passed",
-            "output": "Initiator test - this test starts a TCP initiator and reply with bad SYN ACK.\n-----------------------------------------\nTesting only ack flag\nPassed only ack flag\n-----------------------------------------\nTesting no flags\nPassed no flags\n-----------------------------------------\nTesting ack num is too small\nPassed ack num is too small\n-----------------------------------------\nTesting random incorrect ack number\nPassed random incorrect ack number\n-----------------------------------------\nTesting ack num is too big\nPassed ack num is too big\nDuration of test_initiator_handshake.TestCases.test_initiator_ignores_bad_synack: 6.016s\n",
+            "output": "Initiator test - this test starts a TCP initiator and reply with bad SYN ACK.\n-----------------------------------------\nTesting only ack flag\nPassed only ack flag\n-----------------------------------------\nTesting no flags\nPassed no flags\n-----------------------------------------\nTesting ack num is too small\nPassed ack num is too small\n-----------------------------------------\nTesting random incorrect ack number\nPassed random incorrect ack number\n-----------------------------------------\nTesting ack num is too big\nPassed ack num is too big\nDuration of test_initiator_handshake.TestCases.test_initiator_ignores_bad_synack: 6.015s\n",
             "number": "1.2"
         },
         {
@@ -93,7 +93,7 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Listener test - this test starts a TCP listener and sends data packet to the listener.\n-----------------------------------------\nTesting data packet with payload length 1\nPassed data packet with payload length 1.\n-----------------------------------------\nTesting data packet with payload random length\nPassed data packet with payload random length.\n-----------------------------------------\nTesting data packet with payload another random length\nPassed data packet with payload another random length.\n-----------------------------------------\nTesting data packet with payload length 750\nPassed data packet with payload length 750.\n-----------------------------------------\nTesting data packet with payload length 1377\nPassed data packet with payload length 1377.\nDuration of test_listener_handshake.TestCases.test_accept_data: 10.039s\n",
+            "output": "Listener test - this test starts a TCP listener and sends data packet to the listener.\n-----------------------------------------\nTesting data packet with payload length 1\nPassed data packet with payload length 1.\n-----------------------------------------\nTesting data packet with payload random length\nPassed data packet with payload random length.\n-----------------------------------------\nTesting data packet with payload another random length\nPassed data packet with payload another random length.\n-----------------------------------------\nTesting data packet with payload length 750\nPassed data packet with payload length 750.\n-----------------------------------------\nTesting data packet with payload length 1377\nPassed data packet with payload length 1377.\nDuration of test_listener_handshake.TestCases.test_accept_data: 10.032s\n",
             "number": "2.5"
         },
         {
@@ -125,7 +125,7 @@
             "score": 5.0,
             "max_score": 5.0,
             "status": "passed",
-            "output": "Listener test - this test starts a TCP listener and checks for retransmitted SYN ACK packets.\n-----------------------------------------\nTesting initial seq num is 0.\nPassed initial seq num is 0.\n-----------------------------------------\nTesting initial seq num is 1.\nPassed initial seq num is 1.\n-----------------------------------------\nTesting initial seq num is 1000.\nPassed initial seq num is 1000.\n-----------------------------------------\nTesting initial seq num is random.\nPassed initial seq num is random.\nDuration of test_listener_handshake.TestCases.test_retransmit_syn_ack: 16.033s\n",
+            "output": "Listener test - this test starts a TCP listener and checks for retransmitted SYN ACK packets.\n-----------------------------------------\nTesting initial seq num is 0.\nPassed initial seq num is 0.\n-----------------------------------------\nTesting initial seq num is 1.\nPassed initial seq num is 1.\n-----------------------------------------\nTesting initial seq num is 1000.\nPassed initial seq num is 1000.\n-----------------------------------------\nTesting initial seq num is random.\nPassed initial seq num is random.\nDuration of test_listener_handshake.TestCases.test_retransmit_syn_ack: 16.032s\n",
             "number": "2.3"
         },
         {
@@ -149,12 +149,12 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Retransmission test - this test checks if sender retransmits data packets on timeout.\nPassed data packet retransmission test.\nDuration of test_retransmit.TestCases.test_retransmit_data: 5.010s\n",
+            "output": "Retransmission test - this test checks if sender retransmits data packets on timeout.\nPassed data packet retransmission test.\nDuration of test_retransmit.TestCases.test_retransmit_data: 5.009s\n",
             "number": "4.1"
         }
     ],
     "leaderboard": [],
     "visibility": "visible",
-    "execution_time": "110.24",
-    "score": 142.5
+    "execution_time": "113.52",
+    "score": 150.0
 }

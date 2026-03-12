@@ -77,6 +77,7 @@ void handle_pkt_handshake(ut_socket_t* sock, ut_tcp_header_t* hdr) {
     * If the socket is a listener, it handles incoming SYN packets and ACK responses, updating the socket’s state and windows as needed.
     */
     sock->send_adv_win = get_advertised_window(hdr);
+    // printf("%d\n",sock->send_adv_win);
     if (sock->type == TCP_INITIATOR) {
         if ((get_flags(hdr) & SYN_FLAG_MASK) && (get_flags(hdr) & ACK_FLAG_MASK) && (get_ack(hdr) - 1 == sock->send_win.last_sent + 1)) {
             sock->recv_win.last_read = sock->recv_win.last_recv = get_seq(hdr);
@@ -304,11 +305,11 @@ void recv_pkts(ut_socket_t* sock) {
         */
         if (sock->send_win.last_sent != sock->send_win.last_ack) {
             // Only adjust window if data was in flight
-            sock->dup_ack_count = 0;
             sock->slow_start_thresh = MAX(sock->cong_win / 2, MSS);
             sock->cong_win = MSS;
             sock->send_win.last_sent = sock->send_win.last_ack;
         }
+        sock->dup_ack_count = 0;
         return;
     }
 
@@ -389,6 +390,7 @@ void send_pkts_data(ut_socket_t* sock) {
         }
     }
     // printf("%d %d sending %d\n", sock->cong_win, sock->slow_start_thresh, total_send);
+    // fflush(stdout);
     // printf("%d\n", sock->send_adv_win);
     // printf("%u %u %u %u %u %u %u\n", total_send, sock->cong_win, sock->send_win.last_write - sock->send_win.last_sent, sock->send_adv_win, sock->recv_fin, sock->fin_acked,sock->dying);
     // printf("%d %d %d %d %d %d %d\n", total_send, sock->send_win.last_ack, sock->send_win.last_sent, sock->send_win.last_write, sock->recv_win.last_read, sock->recv_win.next_expect, sock->recv_win.last_recv);
