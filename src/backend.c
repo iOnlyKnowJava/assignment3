@@ -21,6 +21,8 @@
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 
+int sent = 0, acked = 0;
+
 void send_empty(ut_socket_t* sock, int s_flags, bool fin_ack, bool send_fin) {
     size_t conn_len = sizeof(sock->conn);
     int sockfd = sock->socket;
@@ -98,6 +100,8 @@ void handle_pkt_handshake(ut_socket_t* sock, ut_tcp_header_t* hdr) {
 }
 
 void handle_ack(ut_socket_t* sock, ut_tcp_header_t* hdr) {
+    acked++;
+    // printf("ack %d\n",get_ack(hdr) - 1);
     if (after(get_ack(hdr) - 1, sock->send_win.last_ack)) {
         while (pthread_mutex_lock(&(sock->send_lock)) != 0) {
         }
@@ -113,7 +117,7 @@ void handle_ack(ut_socket_t* sock, ut_tcp_header_t* hdr) {
             sock->cong_win = sock->slow_start_thresh;
         } else {
             // printf("\nB %d %d\n",sock->cong_win,sock->slow_start_thresh);
-            sock->cong_win += (sock->cong_win <= sock->slow_start_thresh) ? MSS : MSS * MSS / sock->cong_win;
+            sock->cong_win += (sock->cong_win <= sock->slow_start_thresh) ? MSS : (MSS * MSS / sock->cong_win);
         }
         sock->dup_ack_count = 0;
         if (after(get_ack(hdr) - 1, sock->send_win.last_ack)) {
@@ -389,11 +393,17 @@ void send_pkts_data(ut_socket_t* sock) {
         * Refer to the send_empty function for guidance on creating and sending packets.
       * Update the last sent sequence number after each packet is sent.
     */
-    uint32_t total_send = MIN(sock->cong_win, sock->send_win.last_write - sock->send_win.last_sent);
+    uint32_t total_send = MIN(sock->cong_win + sock->send_win.last_ack - sock->send_win.last_sent, sock->send_win.last_write - sock->send_win.last_sent);
+    if (sock->send_win.last_sent - sock->send_win.last_ack >= sock->cong_win) {
+        total_send = 0;
+    }
     if (total_send > 0 && sock->send_adv_win == 0) {
         total_send = 1;
     } else {
-        total_send = MIN(total_send, sock->send_adv_win);
+        total_send = MIN(total_send, sock->send_adv_win + sock->send_win.last_ack - sock->send_win.last_sent);
+        if (sock->send_win.last_sent - sock->send_win.last_ack >= sock->send_adv_win) {
+            total_send = 0;
+        }
     }
     // printf("%d %d\n", sock->cong_win, sock->slow_start_thresh);
     // printf("%d\n", sock->send_adv_win);
@@ -417,11 +427,13 @@ void send_pkts_data(ut_socket_t* sock) {
         uint16_t plen = hlen + payload_len;
 
         uint8_t* msg = create_packet(
-            src, dst, seq, ack, hlen, plen, ACK_FLAG_MASK, adv_window, payload, payload_len);
+            src, dst, seq, ack, hlen, plen, 0, adv_window, payload, payload_len);
         sendto(sockfd, msg, plen, 0, (struct sockaddr*)&(sock->conn), conn_len);
         free(msg);
         total_send -= payload_len;
         sock->send_win.last_sent += payload_len;
+        // printf("sent %d\n",sock->send_win.last_sent);
+        sent++;
     }
     // The code below will be used to record the congestion window size for your report.
     char* log_path = getenv("CONG_WIN_LOG_PATH");
@@ -483,6 +495,7 @@ void* begin_backend(void* in) {
         }
         send_pkts(sock);
         recv_pkts(sock);
+        // printf("%d %d\n",sent,acked);
         while (pthread_mutex_lock(&(sock->recv_lock)) != 0) {
         }
         uint32_t avail = sock->recv_win.next_expect - sock->recv_win.last_read - 1;
