@@ -13,11 +13,11 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(FLAGS) -c -o $@ $<
 
 server: $(OBJS) $(SRC_DIR)/server.c
-	$(CC) $(FLAGS) $(SRC_DIR)/server.c -o server -fsanitize=address $(OBJS)
+	$(CC) $(FLAGS) $(SRC_DIR)/server.c -o server $(OBJS)
 	cp server $(KATHARA_SHARED_DIR)
 
 client: $(OBJS) $(SRC_DIR)/client.c
-	$(CC) $(FLAGS) $(SRC_DIR)/client.c -o client -fsanitize=address $(OBJS)
+	$(CC) $(FLAGS) $(SRC_DIR)/client.c -o client $(OBJS)
 	cp client $(KATHARA_SHARED_DIR)
 
 test:

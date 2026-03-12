@@ -119,7 +119,7 @@ void handle_ack(ut_socket_t* sock, ut_tcp_header_t* hdr) {
         if (after(get_ack(hdr) - 1, sock->send_win.last_ack)) {
             uint32_t prev_ack = sock->send_win.last_ack;
             sock->send_win.last_ack = get_ack(hdr) - 1;
-            sock->send_win.last_sent = after(sock->send_win.last_sent,sock->send_win.last_ack)?sock->send_win.last_sent:sock->send_win.last_ack;
+            sock->send_win.last_sent = after(sock->send_win.last_sent, sock->send_win.last_ack) ? sock->send_win.last_sent : sock->send_win.last_ack;
             sock->sending_len = sock->send_win.last_write - sock->send_win.last_ack;
             if (sock->sending_len) {
                 uint8_t* temp = malloc(sock->sending_len);
@@ -226,23 +226,41 @@ void update_received_buf(ut_socket_t* sock, uint8_t* pkt) {
         }
     }
     if (sock->received_buf) {
+        uint32_t skip = 0;
         uint32_t seq = get_seq(hdr);
-        uint32_t num = get_payload_len(hdr);
-        if (seq < sock->recv_win.last_read + 1) {
-            num -= sock->recv_win.last_read + 1 - seq;
+        if (before(seq, sock->recv_win.last_read + 1)) {
+            skip = sock->recv_win.last_read + 1 - seq;
             seq = sock->recv_win.last_read + 1;
+            // printf("TEST");
         }
-        memcpy(sock->received_buf + seq - sock->recv_win.last_read - 1u, get_payload(pkt), MIN(num, sock->recv_win.last_recv - seq + 1u));
+        // printf("%d",sock->received_buf + seq - sock->recv_win.last_read - 1u);
+        uint32_t start = seq - sock->recv_win.last_read - 1;
+        memcpy(sock->received_buf + start, get_payload(pkt) + skip, potential_end - seq + 1);
+        // printf("Write %lld %lld\n",start+sock->recv_win.last_read + 1,potential_end);
+        // if (*(uint8_t*)(sock->received_buf + start) == 276 || *(uint64_t*)(sock->received_buf) == 0) {
+        //     printf("%ld %ld %ld %ld %ld %ld %ld  a\n", sock->recv_win.last_recv, sock->recv_win.next_expect, sock->recv_win.last_read, sock->received_buf, seq, skip, *(uint64_t*)get_payload(pkt));
+        // }
+        // fflush(stdout);
+        // if(seq>=75000){
+        //     printf("packet len: %d\n",get_payload_len(pkt));
+        //     for(int i=seq;i<=potential_end;i++){
+        //         printf("%u ",*(get_payload(pkt)+(i-seq)));
+        //     }
+        //     printf("\n");
+        // }
+        // if (potential_end!=get_payload_len(pkt)+get_seq(hdr)-1) {
+        //     printf("%ld %ld %ld %ld %ld %ld %ld %ld %ld a\n", sock->recv_win.last_recv, sock->recv_win.next_expect, sock->recv_win.last_read, sock->received_buf, seq, skip, *(uint64_t*)get_payload(pkt),potential_end,get_payload_len(pkt)+get_seq(hdr)-1);
+        // }
     }
 
     if (get_seq(hdr) == sock->recv_win.next_expect) {
         sock->recv_win.next_expect = potential_end + 1;
     } else {
-        add_recv_seg(sock, after(get_seq(hdr),sock->recv_win.last_read+1)?get_seq(hdr):sock->recv_win.last_read+1, potential_end);
+        add_recv_seg(sock, get_seq(hdr), potential_end);
     }
     merge_recv_segs(sock);
     send_empty(sock, ACK_FLAG_MASK, false, false);
-    sock->received_len = sock->recv_win.next_expect - sock->recv_win.last_read - 1;
+    sock->received_len = sock->recv_win.last_recv - sock->recv_win.last_read;
 }
 
 void handle_pkt(ut_socket_t* sock, uint8_t* pkt) {
@@ -377,7 +395,7 @@ void send_pkts_data(ut_socket_t* sock) {
     } else {
         total_send = MIN(total_send, sock->send_adv_win);
     }
-    printf("%d %d\n", sock->cong_win, sock->slow_start_thresh);
+    // printf("%d %d\n", sock->cong_win, sock->slow_start_thresh);
     // printf("%d\n", sock->send_adv_win);
     // printf("%u %u %u %u %u %u %u\n", total_send, sock->cong_win, sock->send_win.last_write - sock->send_win.last_sent, sock->send_adv_win, sock->recv_fin, sock->fin_acked,sock->dying);
     // printf("%d %d %d %d %d %d %d\n", total_send, sock->send_win.last_ack, sock->send_win.last_sent, sock->send_win.last_write, sock->recv_win.last_read, sock->recv_win.next_expect, sock->recv_win.last_recv);

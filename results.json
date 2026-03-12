@@ -21,7 +21,7 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Congestion control test - this test checks if the implementation returns to slow start on timeout.\nForcing timeout...\nAfter timeout:\nCongestion window decreased significantly after timeout.\nDuration of test_congestion_control.TestCases.test_goes_to_slow_start_on_timeout: 5.818s\n",
+            "output": "Congestion control test - this test checks if the implementation returns to slow start on timeout.\nForcing timeout...\nAfter timeout:\nCongestion window decreased significantly after timeout.\nDuration of test_congestion_control.TestCases.test_goes_to_slow_start_on_timeout: 5.817s\n",
             "number": "5.3"
         },
         {
@@ -29,15 +29,15 @@
             "score": 2.0,
             "max_score": 10.0,
             "status": "failed",
-            "output": "Congestion control test - this test checks if the congestion window increases exponentially during slow start.\n  0: 2754 bytes - 2.00x\n  1: 3992 bytes - 1.45x\nCongestion window did not increase exponentially during slow start or started with the wrong size. Make sure to set the initial congestion window to WINDOW_INITIAL_WINDOW_SIZE.\nDuration of test_congestion_control.TestCases.test_slow_start: 5.212s\n",
+            "output": "Congestion control test - this test checks if the congestion window increases exponentially during slow start.\n  0: 2754 bytes - 2.00x\n  1: 3992 bytes - 1.45x\nCongestion window did not increase exponentially during slow start or started with the wrong size. Make sure to set the initial congestion window to WINDOW_INITIAL_WINDOW_SIZE.\nDuration of test_congestion_control.TestCases.test_slow_start: 5.213s\n",
             "number": "5.1"
         },
         {
             "name": "test_recv_window_change (test_flow_control.TestCases)",
-            "score": 7.5,
+            "score": 5.0,
             "max_score": 10.0,
             "status": "failed",
-            "output": "Flow control test - this test checks if sender correctly responds to changes in the receiver's advertised window.\n-----------------------------------------\nTesting advertised window with size 1377 bytes\n-----------------------------------------\nTesting advertised window with size 13770 bytes\n-----------------------------------------\nTesting advertised window with size 27540 bytes\n-----------------------------------------\nTesting advertised window with size 41310 bytes\nReceived 183626 bytes, expected at most 41310.\nDuration of test_flow_control.TestCases.test_recv_window_change: 9.562s\n",
+            "output": "Flow control test - this test checks if sender correctly responds to changes in the receiver's advertised window.\n-----------------------------------------\nTesting advertised window with size 1377 bytes\n-----------------------------------------\nTesting advertised window with size 13770 bytes\n-----------------------------------------\nTesting advertised window with size 27540 bytes\nReceived 78000 bytes, expected at most 27540.\nDuration of test_flow_control.TestCases.test_recv_window_change: 6.936s\n",
             "number": "3.1"
         },
         {
@@ -45,15 +45,15 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Flow control test - this test checks if the advertised window is reduced correctly when data is not consumed by the application.\nDuration of test_flow_control.TestCases.test_recv_window_size: 2.028s\n",
+            "output": "Flow control test - this test checks if the advertised window is reduced correctly when data is not consumed by the application.\nDuration of test_flow_control.TestCases.test_recv_window_size: 2.059s\n",
             "number": "3.2"
         },
         {
             "name": "Test that the sender stops transmitting data when the receiver",
-            "score": 0.0,
+            "score": 10.0,
             "max_score": 10.0,
-            "status": "failed",
-            "output": "Flow control test - this test checks if the sender stops sending data when the advertised window is zero.\nAdvertising window = 0 (last_ack=91282)\nDuration of test_flow_control.TestCases.test_zero_window_stops_sender: 6.921s\n\nTest Failed: Sender sent a packet with 1273 bytes of payload while advertised window was 0. Expected at most 1-byte zero-window probes.\n",
+            "status": "passed",
+            "output": "Flow control test - this test checks if the sender stops sending data when the advertised window is zero.\nAdvertising window = 0 (last_ack=77141)\nSender correctly limited transmissions with zero window (20 probe(s) received).\nDuration of test_flow_control.TestCases.test_zero_window_stops_sender: 7.917s\n",
             "number": "3.3"
         },
         {
@@ -61,7 +61,7 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Initiator test - this test starts a TCP initiator and sends data to the initiator.\n-----------------------------------------\nTesting data packet with length 1\nPassed data packet with length 1\n-----------------------------------------\nTesting data packet with length 1000\nPassed data packet with length 1000\n-----------------------------------------\nTesting data packet with random length\nPassed data packet with random length\n-----------------------------------------\nTesting data packet with length 1377\nPassed data packet with length 1377\nDuration of test_initiator_handshake.TestCases.test_initiator_accepts_data: 4.822s\n",
+            "output": "Initiator test - this test starts a TCP initiator and sends data to the initiator.\n-----------------------------------------\nTesting data packet with length 1\nPassed data packet with length 1\n-----------------------------------------\nTesting data packet with length 1000\nPassed data packet with length 1000\n-----------------------------------------\nTesting data packet with random length\nPassed data packet with random length\n-----------------------------------------\nTesting data packet with length 1377\nPassed data packet with length 1377\nDuration of test_initiator_handshake.TestCases.test_initiator_accepts_data: 4.819s\n",
             "number": "1.3"
         },
         {
@@ -77,7 +77,7 @@
             "score": 5.0,
             "max_score": 5.0,
             "status": "passed",
-            "output": "Initiator test - this test checks if the initiator initializes sequence numbers randomly.\nDuration of test_initiator_handshake.TestCases.test_initiator_random_sequence_number: 10.019s\n",
+            "output": "Initiator test - this test checks if the initiator initializes sequence numbers randomly.\nDuration of test_initiator_handshake.TestCases.test_initiator_random_sequence_number: 10.018s\n",
             "number": "1.4"
         },
         {
@@ -93,7 +93,7 @@
             "score": 10.0,
             "max_score": 10.0,
             "status": "passed",
-            "output": "Listener test - this test starts a TCP listener and sends data packet to the listener.\n-----------------------------------------\nTesting data packet with payload length 1\nPassed data packet with payload length 1.\n-----------------------------------------\nTesting data packet with payload random length\nPassed data packet with payload random length.\n-----------------------------------------\nTesting data packet with payload another random length\nPassed data packet with payload another random length.\n-----------------------------------------\nTesting data packet with payload length 750\nPassed data packet with payload length 750.\n-----------------------------------------\nTesting data packet with payload length 1377\nPassed data packet with payload length 1377.\nDuration of test_listener_handshake.TestCases.test_accept_data: 10.033s\n",
+            "output": "Listener test - this test starts a TCP listener and sends data packet to the listener.\n-----------------------------------------\nTesting data packet with payload length 1\nPassed data packet with payload length 1.\n-----------------------------------------\nTesting data packet with payload random length\nPassed data packet with payload random length.\n-----------------------------------------\nTesting data packet with payload another random length\nPassed data packet with payload another random length.\n-----------------------------------------\nTesting data packet with payload length 750\nPassed data packet with payload length 750.\n-----------------------------------------\nTesting data packet with payload length 1377\nPassed data packet with payload length 1377.\nDuration of test_listener_handshake.TestCases.test_accept_data: 10.035s\n",
             "number": "2.5"
         },
         {
@@ -101,7 +101,7 @@
             "score": 5.0,
             "max_score": 5.0,
             "status": "passed",
-            "output": "Listener test - this test starts a TCP listener and checks for invalid ACK packets after SYN ACK.\n-----------------------------------------\nTesting packet with syn ack flag.\nPassed packet with syn ack flag.\n-----------------------------------------\nTesting packet with no flags.\nPassed packet with no flags.\n-----------------------------------------\nTesting packet with too small ack num.\nPassed packet with too small ack num.\n-----------------------------------------\nTesting packet with too big ack num.\nPassed packet with too big ack num.\nDuration of test_listener_handshake.TestCases.test_drops_bad_ack: 4.013s\n",
+            "output": "Listener test - this test starts a TCP listener and checks for invalid ACK packets after SYN ACK.\n-----------------------------------------\nTesting packet with syn ack flag.\nPassed packet with syn ack flag.\n-----------------------------------------\nTesting packet with no flags.\nPassed packet with no flags.\n-----------------------------------------\nTesting packet with too small ack num.\nPassed packet with too small ack num.\n-----------------------------------------\nTesting packet with too big ack num.\nPassed packet with too big ack num.\nDuration of test_listener_handshake.TestCases.test_drops_bad_ack: 4.014s\n",
             "number": "2.4"
         },
         {
@@ -155,6 +155,6 @@
     ],
     "leaderboard": [],
     "visibility": "visible",
-    "execution_time": "120.38",
-    "score": 129.5
+    "execution_time": "118.78",
+    "score": 137.0
 }
